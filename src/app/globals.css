@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-[#0f206c] text-white min-h-screen;
+  font-family: "Tajawal", "Segoe UI", sans-serif;
+}
+
+input,
+select,
+textarea {
+  @apply text-white;
+}
+
+a {
+  @apply text-white;
+}
