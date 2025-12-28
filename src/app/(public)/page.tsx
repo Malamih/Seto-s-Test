@@ -1,18 +1,36 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-type Category = { id: string; name: string; slug?: string | null; };
 
+type Category = { id: string; name: string; slug?: string | null };
+
+type Instructor = {
+  id: string;
+  name: string | null;
+};
+
+type Course = {
+  id: string;
+  title: string;
+  level?: string | null;
+  duration?: number | null;
+  price?: number | null;
+  category: Category;
+  instructor: Instructor;
+};
 
 export default async function HomePage() {
-  const categories = await prisma.category.findMany({ take: 4 });
-  const topCourses = await prisma.course.findMany({
+  const categories: Category[] = await prisma.category.findMany({ take: 4 });
+
+  const topCourses: Course[] = await prisma.course.findMany({
     where: { status: "PUBLISHED" },
     include: { instructor: true, category: true },
-    take: 4
+    take: 4,
   });
-  const instructors = await prisma.user.findMany({
+
+  const instructors: Instructor[] = await prisma.user.findMany({
     where: { role: "INSTRUCTOR" },
-    take: 3
+    take: 3,
+    select: { id: true, name: true },
   });
 
   return (
@@ -76,14 +94,18 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
-          {topCourses.map((course) => (
+          {topCourses.map((course: Course) => (
             <article key={course.id} className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="h-24 w-full rounded-xl bg-white/10 md:h-20 md:w-32" />
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold">{course.title}</h3>
-                  <p className="text-sm text-white/70">{course.category.name} • {course.instructor.name}</p>
-                  <p className="text-sm text-white/70">${course.price}</p>
+                  <p className="text-sm text-white/70">
+                    {course.category?.name ?? "بدون تصنيف"} • {course.instructor?.name ?? "مدرب"}
+                  </p>
+                  <p className="text-sm text-white/70">
+                    {course.price == null ? "السعر غير محدد" : `$${course.price}`}
+                  </p>
                 </div>
               </div>
               <Link
@@ -100,14 +122,11 @@ export default async function HomePage() {
       <section className="space-y-6">
         <h2 className="text-2xl font-bold">المدربون المميزون</h2>
         <div className="grid gap-6 md:grid-cols-3">
-          {instructors.map((instructor) => (
+          {instructors.map((instructor: Instructor) => (
             <article key={instructor.id} className="rounded-2xl border border-white/10 bg-white/5 p-6">
-              <h3 className="text-lg font-semibold">{instructor.name}</h3>
+              <h3 className="text-lg font-semibold">{instructor.name ?? "مدرب"}</h3>
               <p className="mt-2 text-sm text-white/70">مدرب متخصص في بناء المسارات المهنية.</p>
-              <Link
-                href={`/instructors/${instructor.id}`}
-                className="mt-4 inline-flex text-sm text-white/80"
-              >
+              <Link href={`/instructors/${instructor.id}`} className="mt-4 inline-flex text-sm text-white/80">
                 عرض الملف
               </Link>
             </article>
