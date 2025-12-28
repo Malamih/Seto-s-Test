@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ثينكرا - Thinkra | تسجيل الدخول</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        --primary: #4b6bff;
+        --primary-dark: #354cd6;
+        --bg: #eef2ff;
+        --text: #0f172a;
+        --muted: #6b7280;
+        --card: #ffffff;
+        --border: #e2e8f0;
+        --shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .page {
+        width: min(1100px, 96vw);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 28px;
+        align-items: center;
+        padding: 32px 0;
+      }
+
+      .intro {
+        padding: 18px 12px;
+      }
+
+      .intro h1 {
+        font-size: clamp(2rem, 2.6vw, 2.6rem);
+        margin: 0 0 12px;
+      }
+
+      .intro p {
+        margin: 0 0 22px;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 1.05rem;
+      }
+
+      .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .badge {
+        background: #fff;
+        border-radius: 999px;
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        font-weight: 600;
+        color: var(--primary-dark);
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 22px;
+        padding: 28px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .brand img {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        object-fit: cover;
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+
+      .brand h2 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      .brand span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-top: 4px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        background: #f8fafc;
+        padding: 6px;
+        border-radius: 999px;
+        margin-bottom: 18px;
+        border: 1px solid var(--border);
+      }
+
+      .tab {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 10px 12px;
+        border-radius: 999px;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--muted);
+        transition: all 0.2s ease;
+      }
+
+      .tab.is-active {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 8px 18px rgba(75, 107, 255, 0.25);
+      }
+
+      form {
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      form.is-active {
+        display: flex;
+      }
+
+      label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: inline-block;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+        background: #fff;
+      }
+
+      input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(75, 107, 255, 0.15);
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 0.95rem;
+      }
+
+      .row a {
+        color: var(--primary-dark);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .row a:hover {
+        color: var(--primary);
+      }
+
+      .helper {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      button[type="submit"] {
+        border: none;
+        background: var(--primary);
+        color: #fff;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+
+      button[type="submit"]:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+      }
+
+      .footer-links {
+        margin-top: 10px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .footer-links button {
+        border: none;
+        background: none;
+        color: var(--primary-dark);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .note {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 14px;
+        border: 1px dashed var(--border);
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="intro">
+        <h1>مرحبًا بك في منصة ثينكرا - Thinkra</h1>
+        <p>
+          نظام متكامل لإدارة تسجيل الدخول وإنشاء الحسابات واستعادة كلمة المرور. صممنا
+          الواجهة لتكون واضحة وآمنة وسهلة الاستخدام على جميع الأجهزة.
+        </p>
+        <div class="badges">
+          <div class="badge">تسجيل دخول سريع</div>
+          <div class="badge">إنشاء حساب جديد</div>
+          <div class="badge">استعادة كلمة المرور</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="brand">
+          <img src="https://thinkra.net/logo.png" alt="Thinkra logo" />
+          <div>
+            <h2>ثينكرا - Thinkra</h2>
+            <span>قم بإدارة حسابك بكل سهولة</span>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="أنواع الحساب">
+          <button class="tab is-active" type="button" data-tab="login">تسجيل الدخول</button>
+          <button class="tab" type="button" data-tab="signup">حساب جديد</button>
+          <button class="tab" type="button" data-tab="forgot">نسيت كلمة السر</button>
+        </div>
+
+        <form id="login" class="is-active" aria-label="تسجيل الدخول">
+          <div>
+            <label for="login-email">البريد الإلكتروني</label>
+            <input id="login-email" name="email" type="email" placeholder="name@example.com" required />
+          </div>
+          <div>
+            <label for="login-password">كلمة المرور</label>
+            <input id="login-password" name="password" type="password" placeholder="••••••••" required />
+          </div>
+          <div class="row">
+            <label>
+              <input type="checkbox" name="remember" />
+              تذكرني
+            </label>
+            <a href="#" data-target="forgot">نسيت كلمة المرور؟</a>
+          </div>
+          <button type="submit">تسجيل الدخول</button>
+          <div class="footer-links">
+            ليس لديك حساب؟
+            <button type="button" data-target="signup">إنشاء حساب</button>
+          </div>
+        </form>
+
+        <form id="signup" aria-label="إنشاء حساب جديد">
+          <div>
+            <label for="signup-name">الاسم الكامل</label>
+            <input id="signup-name" name="name" type="text" placeholder="أدخل اسمك الكامل" required />
+          </div>
+          <div>
+            <label for="signup-email">البريد الإلكتروني</label>
+            <input id="signup-email" name="email" type="email" placeholder="name@example.com" required />
+          </div>
+          <div>
+            <label for="signup-password">كلمة المرور</label>
+            <input id="signup-password" name="password" type="password" placeholder="اختر كلمة مرور قوية" required />
+          </div>
+          <div>
+            <label for="signup-confirm">تأكيد كلمة المرور</label>
+            <input id="signup-confirm" name="confirm" type="password" placeholder="أعد إدخال كلمة المرور" required />
+          </div>
+          <div class="note">
+            بإمكانك استخدام بريدك الإلكتروني للتسجيل، وسيتم إرسال رابط تفعيل مباشر.
+          </div>
+          <button type="submit">إنشاء حساب</button>
+          <div class="footer-links">
+            لديك حساب بالفعل؟
+            <button type="button" data-target="login">تسجيل الدخول</button>
+          </div>
+        </form>
+
+        <form id="forgot" aria-label="استعادة كلمة المرور">
+          <div>
+            <label for="forgot-email">البريد الإلكتروني المسجل</label>
+            <input id="forgot-email" name="email" type="email" placeholder="name@example.com" required />
+          </div>
+          <p class="helper">
+            أرسل طلب الاستعادة وسيتم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.
+          </p>
+          <button type="submit">إرسال رابط الاستعادة</button>
+          <div class="footer-links">
+            تذكرت كلمة المرور؟
+            <button type="button" data-target="login">العودة لتسجيل الدخول</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const tabs = document.querySelectorAll(".tab");
+      const forms = document.querySelectorAll("form");
+      const linkTriggers = document.querySelectorAll("[data-target]");
+
+      const activateTab = (target) => {
+        tabs.forEach((tab) => {
+          tab.classList.toggle("is-active", tab.dataset.tab === target);
+        });
+        forms.forEach((form) => {
+          form.classList.toggle("is-active", form.id === target);
+        });
+      };
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => activateTab(tab.dataset.tab));
+      });
+
+      linkTriggers.forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          activateTab(link.dataset.target);
+        });
+      });
+    </script>
+  </body>
+</html>
