@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ثينكرا - Thinkra | منصة تعليمية إبداعية</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        --bg: #0f206c;
+        --primary: #9e28b5;
+        --primary-dark: #7f1f91;
+        --card: rgba(255, 255, 255, 0.08);
+        --border: rgba(255, 255, 255, 0.18);
+        --text: #ffffff;
+        --muted: rgba(255, 255, 255, 0.75);
+        --shadow: 0 30px 60px rgba(15, 23, 42, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top right, rgba(158, 40, 181, 0.35), transparent 55%),
+          var(--bg);
+        color: var(--text);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      header {
+        padding: 32px clamp(20px, 6vw, 80px) 16px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 28px;
+        align-items: center;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .hero-card {
+        background: var(--card);
+        border-radius: 26px;
+        padding: 28px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .brand img {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        background: #fff;
+        object-fit: cover;
+        border: 1px solid var(--border);
+      }
+
+      .brand h1 {
+        font-size: clamp(2rem, 3vw, 2.8rem);
+        margin: 0;
+      }
+
+      .brand p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .btn {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--primary);
+      }
+
+      .section {
+        padding: 28px clamp(20px, 6vw, 80px);
+      }
+
+      .section h2 {
+        margin: 0 0 14px;
+        font-size: clamp(1.5rem, 2.2vw, 2rem);
+      }
+
+      .section p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .tile {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 18px;
+      }
+
+      .tile h3 {
+        margin: 0 0 8px;
+      }
+
+      .tile ul {
+        margin: 0;
+        padding-inline-start: 18px;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .auth {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 6px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+      }
+
+      .tab {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 10px 12px;
+        border-radius: 999px;
+        font-weight: 600;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .tab.is-active {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      form {
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      form.is-active {
+        display: flex;
+      }
+
+      label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: inline-block;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        font-size: 1rem;
+        outline: none;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .helper {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .footer {
+        padding: 30px clamp(20px, 6vw, 80px) 40px;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .admin-info {
+        display: grid;
+        gap: 14px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 18px;
+        padding: 18px;
+        border: 1px solid var(--border);
+      }
+
+      .admin-info strong {
+        color: #fff;
+      }
+
+      .badge {
+        display: inline-flex;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="hero">
+        <div class="hero-card brand">
+          <img src="https://thinkra.net/logo.png" alt="Thinkra logo" />
+          <div>
+            <h1>مرحبًا بك في منصة ثينكرا - Thinkra</h1>
+            <p>
+              منصة رقمية متخصصة بتعليم المهارات الإبداعية مثل التصوير، التصميم،
+              الكتابة وغيرها، تربط الطلاب مع أساتذة مبدعين عبر تجربة حديثة على
+              الويب والموبايل.
+            </p>
+          </div>
+          <div class="cta-row">
+            <a class="btn" href="#auth">ابدأ الآن</a>
+            <a class="btn btn-outline" href="#dashboard">استكشف الداشبورد</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <h2>لماذا ثينكرا؟</h2>
+          <p>
+            وفرنا بيئة تعليمية متكاملة تشمل الكورسات المباشرة، إدارة المحتوى،
+            التقييمات، والدفع الآمن مع تقارير وتحليلات دقيقة.
+          </p>
+          <div class="grid">
+            <div class="tile">
+              <h3>تجربة طلاب متقدمة</h3>
+              <ul>
+                <li>لوحة تحكم للطالب مع متابعة التقدّم والشهادات.</li>
+                <li>تعليقات ومناقشات مباشرة داخل كل كورس.</li>
+                <li>جلسات بث مباشر بالصوت والفيديو.</li>
+              </ul>
+            </div>
+            <div class="tile">
+              <h3>أدوات الأساتذة</h3>
+              <ul>
+                <li>لوحة تحكم للأستاذ لمتابعة الكورسات والطلاب.</li>
+                <li>رفع فيديوهات وملفات ومواد تعليمية بسهولة.</li>
+                <li>تقارير تحليلات لمعرفة نسب الإنجاز.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="dashboard" class="section">
+      <h2>لوحات التحكم الرئيسية</h2>
+      <p>
+        الداشبورد الرئيسي يجمع كل الأطراف، ويوفر إحصائيات مباشرة للمبيعات،
+        التفاعل، ونسب الإكمال.
+      </p>
+      <div class="grid">
+        <div class="tile">
+          <h3>داشبورد الإدارة</h3>
+          <ul>
+            <li>إدارة المحتوى، الكورسات، والأساتذة.</li>
+            <li>متابعة عمليات الدفع والاشتراكات.</li>
+            <li>مراقبة الأداء عبر تقارير وتحليلات.</li>
+          </ul>
+        </div>
+        <div class="tile">
+          <h3>داشبورد الطلاب</h3>
+          <ul>
+            <li>عرض الكورسات المشتركة ومواعيد الجلسات.</li>
+            <li>نسبة الإنجاز لكل كورس وشهادة الإتمام.</li>
+            <li>إشعارات عند إضافة درس جديد.</li>
+          </ul>
+        </div>
+        <div class="tile">
+          <h3>داشبورد الأساتذة</h3>
+          <ul>
+            <li>إدارة الكورسات، الجلسات المباشرة، والمواد.</li>
+            <li>تفاعل سريع مع أسئلة الطلاب.</li>
+            <li>تحليل نسب المشاهدة والتقييمات.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>مزايا إضافية للمنصة</h2>
+      <p>
+        نظام دفع آمن، إشعارات لحظية، تقييمات وتصنيفات، وتجربة موحدة بين الويب
+        وتطبيقات الموبايل.
+      </p>
+      <div class="grid">
+        <div class="tile">
+          <h3>نظام دفع آمن</h3>
+          <p class="helper">شراء الكورسات بسهولة مع حماية كاملة للبيانات.</p>
+        </div>
+        <div class="tile">
+          <h3>إشعارات وتنبيهات</h3>
+          <p class="helper">تنبيه الطلاب عند إضافة درس أو اقتراب موعد امتحان.</p>
+        </div>
+        <div class="tile">
+          <h3>تقييمات وتصنيفات</h3>
+          <p class="helper">الطلاب يقيمون الكورسات لتحسين جودة المحتوى.</p>
+        </div>
+        <div class="tile">
+          <h3>جلسات مباشرة</h3>
+          <p class="helper">تفاعل بالصوت والفيديو مع الأساتذة في الوقت الحقيقي.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="auth" class="section">
+      <h2>تسجيل الدخول وإنشاء الحساب</h2>
+      <p>
+        قم بإدارة حسابك بسهولة عبر نظام تسجيل دخول آمن مع إمكانية إنشاء حساب
+        جديد أو استعادة كلمة المرور.
+      </p>
+      <div class="auth">
+        <div class="hero-card">
+          <div class="tabs" role="tablist" aria-label="أنواع الحساب">
+            <button class="tab is-active" type="button" data-tab="login">تسجيل الدخول</button>
+            <button class="tab" type="button" data-tab="signup">حساب جديد</button>
+            <button class="tab" type="button" data-tab="forgot">نسيت كلمة السر</button>
+          </div>
+
+          <form id="login" class="is-active" aria-label="تسجيل الدخول">
+            <div>
+              <label for="login-email">البريد الإلكتروني</label>
+              <input id="login-email" name="email" type="email" placeholder="name@example.com" required />
+            </div>
+            <div>
+              <label for="login-password">كلمة المرور</label>
+              <input id="login-password" name="password" type="password" placeholder="••••••••" required />
+            </div>
+            <div class="helper">يمكنك استخدام بيانات الدخول الخاصة بالطالب أو الأستاذ أو الإدارة.</div>
+            <button class="btn" type="submit">تسجيل الدخول</button>
+            <div class="helper">
+              نسيت كلمة المرور؟ <a href="#" data-target="forgot">اضغط هنا</a>
+            </div>
+          </form>
+
+          <form id="signup" aria-label="إنشاء حساب جديد">
+            <div>
+              <label for="signup-name">الاسم الكامل</label>
+              <input id="signup-name" name="name" type="text" placeholder="أدخل اسمك الكامل" required />
+            </div>
+            <div>
+              <label for="signup-email">البريد الإلكتروني</label>
+              <input id="signup-email" name="email" type="email" placeholder="name@example.com" required />
+            </div>
+            <div>
+              <label for="signup-role">نوع الحساب</label>
+              <select id="signup-role" name="role" required>
+                <option value="student">طالب</option>
+                <option value="teacher">أستاذ</option>
+              </select>
+            </div>
+            <div>
+              <label for="signup-password">كلمة المرور</label>
+              <input id="signup-password" name="password" type="password" placeholder="اختر كلمة مرور قوية" required />
+            </div>
+            <button class="btn" type="submit">إنشاء حساب</button>
+          </form>
+
+          <form id="forgot" aria-label="استعادة كلمة المرور">
+            <div>
+              <label for="forgot-email">البريد الإلكتروني المسجل</label>
+              <input id="forgot-email" name="email" type="email" placeholder="name@example.com" required />
+            </div>
+            <p class="helper">
+              سيتم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.
+            </p>
+            <button class="btn" type="submit">إرسال رابط الاستعادة</button>
+          </form>
+        </div>
+
+        <div class="hero-card admin-info">
+          <span class="badge">معلومات الإدارة والدخول السريع</span>
+          <p class="helper">
+            هذه بيانات تجريبية لتصفح لوحة التحكم وتقييم التجربة. يمكنك تغييرها لاحقًا.
+          </p>
+          <div>
+            <strong>حساب الإدارة:</strong>
+            admin@thinkra.net — كلمة المرور: Thinkra@2024
+          </div>
+          <div>
+            <strong>حساب أستاذ:</strong>
+            mentor@thinkra.net — كلمة المرور: Mentor@2024
+          </div>
+          <div>
+            <strong>حساب طالب:</strong>
+            student@thinkra.net — كلمة المرور: Student@2024
+          </div>
+          <p class="helper">
+            لوحة التحكم توفر الوصول للتقارير، إدارة الكورسات، ومتابعة الدفع بشكل متكامل.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      جميع الحقوق محفوظة © 2024 منصة ثينكرا - Thinkra
+    </footer>
+
+    <script>
+      const tabs = document.querySelectorAll(".tab");
+      const forms = document.querySelectorAll("form");
+      const linkTriggers = document.querySelectorAll("[data-target]");
+
+      const activateTab = (target) => {
+        tabs.forEach((tab) => {
+          tab.classList.toggle("is-active", tab.dataset.tab === target);
+        });
+        forms.forEach((form) => {
+          form.classList.toggle("is-active", form.id === target);
+        });
+      };
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => activateTab(tab.dataset.tab));
+      });
+
+      linkTriggers.forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          activateTab(link.dataset.target);
+        });
+      });
+    </script>
+  </body>
+</html>
