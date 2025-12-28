@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
+import type { Category } from "@/types/domain";
 
 export default async function AdminCategoriesPage() {
   await requireRole(["ADMIN"]);
-  const categories = await prisma.category.findMany({ orderBy: { createdAt: "desc" } });
+  const categories: Category[] = await prisma.category.findMany({ orderBy: { createdAt: "desc" } });
 
   async function createCategory(formData: FormData) {
     "use server";
@@ -45,7 +46,7 @@ export default async function AdminCategoriesPage() {
         </button>
       </form>
       <div className="space-y-3">
-        {categories.map((category) => (
+        {categories.map((category: Category) => (
           <div key={category.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <p className="font-semibold">{category.name}</p>
             <p className="text-sm text-white/70">{category.slug}</p>

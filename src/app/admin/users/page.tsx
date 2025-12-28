@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
+import type { User } from "@/types/domain";
 
 export default async function AdminUsersPage() {
   await requireRole(["ADMIN"]);
-  const users = await prisma.user.findMany({ orderBy: { createdAt: "desc" } });
+  const users: User[] = await prisma.user.findMany({ orderBy: { createdAt: "desc" } });
 
   async function updateUser(formData: FormData) {
     "use server";
@@ -30,7 +31,7 @@ export default async function AdminUsersPage() {
         <p className="text-white/70">تعديل الأدوار وتفعيل/تعطيل الحسابات.</p>
       </header>
       <div className="space-y-4">
-        {users.map((user) => (
+        {users.map((user: User) => (
           <form key={user.id} action={updateUser} className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <input type="hidden" name="userId" value={user.id} />
             <div className="flex flex-wrap items-center justify-between gap-4">

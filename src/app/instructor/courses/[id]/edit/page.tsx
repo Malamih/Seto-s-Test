@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
+import type { Category } from "@/types/domain";
 
 interface EditCourseProps {
   params: { id: string };
@@ -11,7 +12,7 @@ export default async function EditCoursePage({ params }: EditCourseProps) {
   const course = await prisma.course.findFirst({
     where: { id: params.id, instructorId: session.user.id as string }
   });
-  const categories = await prisma.category.findMany();
+  const categories: Category[] = await prisma.category.findMany();
 
   if (!course) {
     return <p>الدورة غير متاحة.</p>;
@@ -75,7 +76,7 @@ export default async function EditCoursePage({ params }: EditCourseProps) {
             defaultValue={course.categoryId}
             className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm"
           >
-            {categories.map((category) => (
+            {categories.map((category: Category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>

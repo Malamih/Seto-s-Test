@@ -1,5 +1,10 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
+
+type EnrollmentWithUserProgress = Prisma.EnrollmentGetPayload<{
+  include: { user: true; progress: true };
+}>;
 
 interface StudentsPageProps {
   params: { id: string };
@@ -7,7 +12,7 @@ interface StudentsPageProps {
 
 export default async function CourseStudentsPage({ params }: StudentsPageProps) {
   const session = await requireRole(["INSTRUCTOR"]);
-  const enrollments = await prisma.enrollment.findMany({
+  const enrollments: EnrollmentWithUserProgress[] = await prisma.enrollment.findMany({
     where: { courseId: params.id, course: { instructorId: session.user.id as string } },
     include: { user: true, progress: true }
   });
@@ -19,7 +24,7 @@ export default async function CourseStudentsPage({ params }: StudentsPageProps) 
         <p className="text-white/70">متابعة تقدم الطلاب في هذه الدورة.</p>
       </header>
       <div className="space-y-4">
-        {enrollments.map((enrollment) => {
+        {enrollments.map((enrollment: EnrollmentWithUserProgress) => {
           const total = enrollment.progress.length;
           const completed = enrollment.progress.filter((item) => item.isCompleted).length;
           const percentage = total ? Math.round((completed / total) * 100) : 0;

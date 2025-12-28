@@ -1,6 +1,9 @@
+import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
+
+type CourseWithLessons = Prisma.CourseGetPayload<{ include: { lessons: true } }>;
 
 interface CourseLessonsProps {
   params: { id: string };
@@ -8,7 +11,7 @@ interface CourseLessonsProps {
 
 export default async function CourseLessonsPage({ params }: CourseLessonsProps) {
   const session = await requireRole(["INSTRUCTOR"]);
-  const course = await prisma.course.findFirst({
+  const course: CourseWithLessons | null = await prisma.course.findFirst({
     where: { id: params.id, instructorId: session.user.id as string },
     include: { lessons: { orderBy: { order: "asc" } } }
   });
@@ -87,7 +90,7 @@ export default async function CourseLessonsPage({ params }: CourseLessonsProps) 
         </button>
       </form>
       <div className="space-y-4">
-        {course.lessons.map((lesson) => (
+        {course.lessons.map((lesson: CourseWithLessons["lessons"][number]) => (
           <div key={lesson.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <h2 className="font-semibold">{lesson.title}</h2>
             <p className="text-sm text-white/70">الترتيب: {lesson.order}</p>

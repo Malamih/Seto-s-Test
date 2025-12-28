@@ -1,9 +1,12 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
+type NotificationItem = Prisma.NotificationGetPayload<{}>;
+
 export default async function NotificationsPage() {
   const session = await requireRole(["STUDENT"]);
-  const notifications = await prisma.notification.findMany({
+  const notifications: NotificationItem[] = await prisma.notification.findMany({
     where: { userId: session.user.id as string },
     orderBy: { createdAt: "desc" }
   });
@@ -15,7 +18,7 @@ export default async function NotificationsPage() {
         <p className="text-white/70">جميع التنبيهات والتحديثات الخاصة بك.</p>
       </header>
       <div className="space-y-4">
-        {notifications.map((notification) => (
+        {notifications.map((notification: NotificationItem) => (
           <div key={notification.id} className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-lg font-semibold">{notification.title}</h2>
             <p className="mt-2 text-sm text-white/70">{notification.message}</p>

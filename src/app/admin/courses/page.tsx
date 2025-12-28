@@ -1,10 +1,15 @@
+import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
+type CourseWithRelations = Prisma.CourseGetPayload<{
+  include: { instructor: true; category: true };
+}>;
+
 export default async function AdminCoursesPage() {
   await requireRole(["ADMIN"]);
-  const courses = await prisma.course.findMany({
+  const courses: CourseWithRelations[] = await prisma.course.findMany({
     include: { instructor: true, category: true },
     orderBy: { createdAt: "desc" }
   });
@@ -31,7 +36,7 @@ export default async function AdminCoursesPage() {
         <p className="text-white/70">مراجعة الدورات والموافقة عليها.</p>
       </header>
       <div className="space-y-4">
-        {courses.map((course) => (
+        {courses.map((course: CourseWithRelations) => (
           <form key={course.id} action={updateCourse} className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <input type="hidden" name="courseId" value={course.id} />
             <div className="flex flex-wrap items-center justify-between gap-4">

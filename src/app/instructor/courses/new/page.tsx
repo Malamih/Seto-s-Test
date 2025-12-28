@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
+import type { Category } from "@/types/domain";
 
 export default async function NewCoursePage() {
   const session = await requireRole(["INSTRUCTOR"]);
-  const categories = await prisma.category.findMany();
+  const categories: Category[] = await prisma.category.findMany();
 
   async function createCourse(formData: FormData) {
     "use server";
@@ -63,7 +64,7 @@ export default async function NewCoursePage() {
             name="categoryId"
             className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm"
           >
-            {categories.map((category) => (
+            {categories.map((category: Category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>

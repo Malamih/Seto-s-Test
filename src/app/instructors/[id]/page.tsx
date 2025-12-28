@@ -1,12 +1,17 @@
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+
+type InstructorWithCourses = Prisma.UserGetPayload<{
+  include: { courses: true };
+}>;
 
 interface InstructorPageProps {
   params: { id: string };
 }
 
 export default async function InstructorPage({ params }: InstructorPageProps) {
-  const instructor = await prisma.user.findUnique({
+  const instructor: InstructorWithCourses | null = await prisma.user.findUnique({
     where: { id: params.id },
     include: { courses: { where: { status: "PUBLISHED" } } }
   });
@@ -24,7 +29,7 @@ export default async function InstructorPage({ params }: InstructorPageProps) {
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 space-y-4">
         <h2 className="text-lg font-semibold">الدورات المقدمة</h2>
         <div className="grid gap-4 md:grid-cols-2">
-          {instructor.courses.map((course) => (
+          {instructor.courses.map((course: InstructorWithCourses["courses"][number]) => (
             <article key={course.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <h3 className="font-semibold">{course.title}</h3>
               <p className="mt-2 text-sm text-white/70">{course.description}</p>

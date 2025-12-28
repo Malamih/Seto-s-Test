@@ -1,10 +1,15 @@
+import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
+type CommentWithRelations = Prisma.CommentGetPayload<{
+  include: { user: true; course: true; lesson: true };
+}>;
+
 export default async function InstructorCommentsPage() {
   const session = await requireRole(["INSTRUCTOR"]);
-  const comments = await prisma.comment.findMany({
+  const comments: CommentWithRelations[] = await prisma.comment.findMany({
     where: { course: { instructorId: session.user.id as string } },
     include: { user: true, course: true, lesson: true },
     orderBy: { createdAt: "desc" }
@@ -32,7 +37,7 @@ export default async function InstructorCommentsPage() {
         <p className="text-white/70">تابع الأسئلة ورد على استفسارات الطلاب.</p>
       </header>
       <div className="space-y-4">
-        {comments.map((comment) => (
+        {comments.map((comment: CommentWithRelations) => (
           <article key={comment.id} className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <div className="text-sm text-white/70">
               <p>الطالب: {comment.user.name}</p>

@@ -1,5 +1,11 @@
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import type { Category } from "@/types/domain";
+
+type CourseWithRelations = Prisma.CourseGetPayload<{
+  include: { category: true; instructor: true; reviews: true };
+}>;
 
 interface CoursesPageProps {
   searchParams?: {
@@ -16,8 +22,8 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
   const price = searchParams?.price ?? "all";
   const rating = Number(searchParams?.rating ?? "0");
 
-  const categories = await prisma.category.findMany();
-  const courses = await prisma.course.findMany({
+  const categories: Category[] = await prisma.category.findMany();
+  const courses: CourseWithRelations[] = await prisma.course.findMany({
     where: {
       status: "PUBLISHED",
       ...(query
@@ -39,7 +45,7 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
     }
   });
 
-  const filtered = courses.filter((course) => {
+  const filtered: CourseWithRelations[] = courses.filter((course: CourseWithRelations) => {
     const avgRating = course.reviews.length
       ? course.reviews.reduce((acc, review) => acc + review.rating, 0) / course.reviews.length
       : 0;
@@ -100,7 +106,7 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
       </form>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {filtered.map((course) => {
+        {filtered.map((course: CourseWithRelations) => {
           const avgRating = course.reviews.length
             ? course.reviews.reduce((acc, review) => acc + review.rating, 0) / course.reviews.length
             : 0;

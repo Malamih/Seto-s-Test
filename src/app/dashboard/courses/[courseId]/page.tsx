@@ -1,6 +1,11 @@
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
+
+type EnrollmentWithProgress = Prisma.EnrollmentGetPayload<{
+  include: { course: true; progress: { include: { lesson: true } } };
+}>;
 
 interface CourseProgressProps {
   params: { courseId: string };
@@ -10,7 +15,7 @@ export default async function CourseProgressPage({ params }: CourseProgressProps
   const session = await requireRole(["STUDENT"]);
   const userId = session.user.id as string;
 
-  const enrollment = await prisma.enrollment.findUnique({
+  const enrollment: EnrollmentWithProgress | null = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId, courseId: params.courseId } },
     include: {
       course: true,
@@ -37,7 +42,7 @@ export default async function CourseProgressPage({ params }: CourseProgressProps
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold">الدروس</h2>
         <ul className="mt-4 space-y-3 text-sm text-white/70">
-          {lessons.map((item) => (
+          {lessons.map((item: EnrollmentWithProgress["progress"][number]) => (
             <li key={item.lessonId} className="flex items-center justify-between">
               <span>{item.lesson.title}</span>
               <Link

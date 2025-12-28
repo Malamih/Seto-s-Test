@@ -1,14 +1,18 @@
+import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
+type CourseListItem = Prisma.CourseGetPayload<{}>;
+type LiveSessionWithCourse = Prisma.LiveSessionGetPayload<{ include: { course: true } }>;
+
 export default async function InstructorSessionsPage() {
   const session = await requireRole(["INSTRUCTOR"]);
   const instructorId = session.user.id as string;
-  const courses = await prisma.course.findMany({
+  const courses: CourseListItem[] = await prisma.course.findMany({
     where: { instructorId }
   });
-  const sessions = await prisma.liveSession.findMany({
+  const sessions: LiveSessionWithCourse[] = await prisma.liveSession.findMany({
     where: { instructorId },
     include: { course: true },
     orderBy: { scheduledAt: "asc" }
@@ -73,7 +77,7 @@ export default async function InstructorSessionsPage() {
           name="courseId"
           className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm"
         >
-          {courses.map((course) => (
+          {courses.map((course: CourseListItem) => (
             <option key={course.id} value={course.id}>
               {course.title}
             </option>
@@ -84,7 +88,7 @@ export default async function InstructorSessionsPage() {
         </button>
       </form>
       <div className="space-y-4">
-        {sessions.map((sessionItem) => (
+        {sessions.map((sessionItem: LiveSessionWithCourse) => (
           <article key={sessionItem.id} className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-lg font-semibold">{sessionItem.title}</h2>
             <p className="text-sm text-white/70">الدورة: {sessionItem.course.title}</p>

@@ -1,11 +1,14 @@
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
+type CourseWithCategory = Prisma.CourseGetPayload<{ include: { category: true } }>;
+
 export default async function InstructorCoursesPage() {
   const session = await requireRole(["INSTRUCTOR"]);
-  const courses = await prisma.course.findMany({
+  const courses: CourseWithCategory[] = await prisma.course.findMany({
     where: { instructorId: session.user.id as string },
     include: { category: true }
   });
@@ -32,7 +35,7 @@ export default async function InstructorCoursesPage() {
         </Link>
       </header>
       <div className="space-y-4">
-        {courses.map((course) => (
+        {courses.map((course: CourseWithCategory) => (
           <article key={course.id} className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>

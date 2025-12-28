@@ -1,16 +1,20 @@
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import type { Category, User } from "@/types/domain";
 
-type Category = { id: string; name: string; slug?: string | null };
+type CourseWithRelations = Prisma.CourseGetPayload<{
+  include: { instructor: true; category: true };
+}>;
 
 export default async function HomePage() {
   const categories: Category[] = await prisma.category.findMany({ take: 4 });
-  const topCourses = await prisma.course.findMany({
+  const topCourses: CourseWithRelations[] = await prisma.course.findMany({
     where: { status: "PUBLISHED" },
     include: { instructor: true, category: true },
     take: 4
   });
-  const instructors = await prisma.user.findMany({
+  const instructors: User[] = await prisma.user.findMany({
     where: { role: "INSTRUCTOR" },
     take: 3
   });
@@ -76,7 +80,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
-          {topCourses.map((course) => (
+          {topCourses.map((course: CourseWithRelations) => (
             <article key={course.id} className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="h-24 w-full rounded-xl bg-white/10 md:h-20 md:w-32" />
@@ -100,7 +104,7 @@ export default async function HomePage() {
       <section className="space-y-6">
         <h2 className="text-2xl font-bold">المدربون المميزون</h2>
         <div className="grid gap-6 md:grid-cols-3">
-          {instructors.map((instructor) => (
+          {instructors.map((instructor: User) => (
             <article key={instructor.id} className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <h3 className="text-lg font-semibold">{instructor.name}</h3>
               <p className="mt-2 text-sm text-white/70">مدرب متخصص في بناء المسارات المهنية.</p>
