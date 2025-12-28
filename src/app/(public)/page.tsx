@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import type { Category } from "@/types/domain";
+
+type Category = { id: string; name: string; slug?: string | null };
 
 export default async function HomePage() {
   const categories: Category[] = await prisma.category.findMany({ take: 4 });
