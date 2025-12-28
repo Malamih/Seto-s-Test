@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+type Category = { id: string; name: string; slug?: string | null; };
+
 
 export default async function HomePage() {
   const categories = await prisma.category.findMany({ take: 4 });
@@ -57,7 +59,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
-          {categories.map((category: any) => (
+          {categories.map((category: Category) => (
             <div key={category.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <h3 className="text-lg font-semibold">{category.name}</h3>
               <p className="mt-2 text-sm text-white/70">اكتشف دورات مخصصة لهذا المجال.</p>
