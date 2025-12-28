@@ -76,9 +76,13 @@
         gap: 16px;
       }
 
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
       label {
         font-weight: 600;
-        margin-bottom: 6px;
         display: inline-block;
       }
 
@@ -97,12 +101,44 @@
         box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.15);
       }
 
+      .input-group {
+        position: relative;
+      }
+
+      .input-group input {
+        padding-inline-end: 48px;
+      }
+
+      .toggle-password {
+        position: absolute;
+        inset-block: 0;
+        inset-inline-end: 10px;
+        margin: auto;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: rgba(45, 108, 223, 0.12);
+        color: var(--primary);
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+
+      .toggle-password:hover {
+        background: rgba(45, 108, 223, 0.2);
+      }
+
       .row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
         font-size: 0.95rem;
+      }
+
+      .hint {
+        font-size: 0.85rem;
+        color: var(--muted);
       }
 
       .row a {
@@ -151,13 +187,19 @@
       </div>
 
       <form>
-        <div>
+        <div class="field">
           <label for="email">البريد الإلكتروني</label>
           <input id="email" name="email" type="email" placeholder="name@example.com" required />
         </div>
-        <div>
+        <div class="field">
           <label for="password">كلمة المرور</label>
-          <input id="password" name="password" type="password" placeholder="••••••••" required />
+          <div class="input-group">
+            <input id="password" name="password" type="password" placeholder="••••••••" required />
+            <button class="toggle-password" type="button" aria-pressed="false">
+              إظهار
+            </button>
+          </div>
+          <span class="hint">استخدم 8 أحرف على الأقل لتأمين حسابك.</span>
         </div>
         <div class="row">
           <label>
@@ -166,6 +208,7 @@
           </label>
           <a href="#">نسيت كلمة المرور؟</a>
         </div>
+        <span class="hint">سيتم الاحتفاظ بتسجيل الدخول لمدة 30 يومًا.</span>
         <button type="submit">تسجيل الدخول</button>
       </form>
 
@@ -173,5 +216,16 @@
         ليس لديك حساب؟ <a href="#">إنشاء حساب</a>
       </div>
     </main>
+    <script>
+      const toggleButton = document.querySelector(".toggle-password");
+      const passwordInput = document.querySelector("#password");
+
+      toggleButton.addEventListener("click", () => {
+        const isHidden = passwordInput.type === "password";
+        passwordInput.type = isHidden ? "text" : "password";
+        toggleButton.textContent = isHidden ? "إخفاء" : "إظهار";
+        toggleButton.setAttribute("aria-pressed", String(isHidden));
+      });
+    </script>
   </body>
 </html>
