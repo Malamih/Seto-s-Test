@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  passwordHash  String
+  role          Role           @default(STUDENT)
+  image         String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  courses       Course[]       @relation("InstructorCourses")
+  enrollments   Enrollment[]
+  reviews       Review[]
+  comments      Comment[]
+  notifications Notification[]
+  certificates  Certificate[]
+  payments      Payment[]
+  liveSessions  LiveSession[]  @relation("InstructorSessions")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  courses   Course[]
+}
+
+model Course {
+  id           String       @id @default(cuid())
+  title        String
+  description  String
+  price        Int
+  thumbnailUrl String
+  status       CourseStatus @default(DRAFT)
+  categoryId   String
+  instructorId String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  category     Category     @relation(fields: [categoryId], references: [id])
+  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  lessons      Lesson[]
+  reviews      Review[]
+  enrollments  Enrollment[]
+  comments     Comment[]
+  payments     Payment[]
+  liveSessions LiveSession[]
+}
+
+model Lesson {
+  id            String    @id @default(cuid())
+  title         String
+  order         Int
+  videoUrl      String
+  attachmentUrl String?
+  courseId      String
+  createdAt     DateTime  @default(now())
+  course        Course    @relation(fields: [courseId], references: [id])
+  progresses    Progress[]
+  comments      Comment[]
+}
+
+model Enrollment {
+  id        String    @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  course    Course    @relation(fields: [courseId], references: [id])
+  progress  Progress[]
+
+  @@unique([userId, courseId])
+}
+
+model Progress {
+  id           String    @id @default(cuid())
+  enrollmentId String
+  lessonId     String
+  isCompleted  Boolean   @default(false)
+  updatedAt    DateTime  @updatedAt
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+  lesson       Lesson     @relation(fields: [lessonId], references: [id])
+
+  @@unique([enrollmentId, lessonId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  reply     String?
+  userId    String
+  courseId  String
+  lessonId  String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+  lesson    Lesson?  @relation(fields: [lessonId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Certificate {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String
+  courseId  String
+  issuedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  amount    Int
+  currency  String
+  status    String
+  provider  String
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model LiveSession {
+  id           String   @id @default(cuid())
+  title        String
+  scheduledAt  DateTime
+  meetingUrl   String
+  instructorId String
+  courseId     String
+  createdAt    DateTime @default(now())
+  instructor   User     @relation("InstructorSessions", fields: [instructorId], references: [id])
+  course       Course   @relation(fields: [courseId], references: [id])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
