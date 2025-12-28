@@ -57,7 +57,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
-          {categories.map((category) => (
+          categories.map((category: any) => (
             <div key={category.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <h3 className="text-lg font-semibold">{category.name}</h3>
               <p className="mt-2 text-sm text-white/70">اكتشف دورات مخصصة لهذا المجال.</p>
