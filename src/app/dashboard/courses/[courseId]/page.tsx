@@ -1,11 +1,11 @@
-import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type EnrollmentWithProgress = Prisma.EnrollmentGetPayload<{
-  include: { course: true; progress: { include: { lesson: true } } };
-}>;
+type Lesson = { id: string; title: string; order: number };
+type ProgressItem = { lessonId: string; isCompleted: boolean; lesson: Lesson };
+type Course = { id: string; title: string };
+type EnrollmentWithProgress = { course: Course; progress: ProgressItem[] };
 
 interface CourseProgressProps {
   params: { courseId: string };
@@ -17,10 +17,14 @@ export default async function CourseProgressPage({ params }: CourseProgressProps
 
   const enrollment: EnrollmentWithProgress | null = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId, courseId: params.courseId } },
-    include: {
-      course: true,
+    select: {
+      course: { select: { id: true, title: true } },
       progress: {
-        include: { lesson: true }
+        select: {
+          lessonId: true,
+          isCompleted: true,
+          lesson: { select: { id: true, title: true, order: true } }
+        }
       }
     }
   });
@@ -42,7 +46,7 @@ export default async function CourseProgressPage({ params }: CourseProgressProps
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold">الدروس</h2>
         <ul className="mt-4 space-y-3 text-sm text-white/70">
-          {lessons.map((item: EnrollmentWithProgress["progress"][number]) => (
+          {lessons.map((item: ProgressItem) => (
             <li key={item.lessonId} className="flex items-center justify-between">
               <span>{item.lesson.title}</span>
               <Link

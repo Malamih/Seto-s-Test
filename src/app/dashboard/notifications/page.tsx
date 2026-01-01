@@ -1,14 +1,14 @@
-import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type NotificationItem = Prisma.NotificationGetPayload<{}>;
+type NotificationItem = { id: string; title: string; message: string };
 
 export default async function NotificationsPage() {
   const session = await requireRole(["STUDENT"]);
   const notifications: NotificationItem[] = await prisma.notification.findMany({
     where: { userId: session.user.id as string },
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
+    select: { id: true, title: true, message: true }
   });
 
   return (

@@ -1,13 +1,12 @@
-import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type EnrollmentWithCourseProgress = Prisma.EnrollmentGetPayload<{
-  include: { course: true; progress: true };
-}>;
-type NotificationItem = Prisma.NotificationGetPayload<{}>;
-type CertificateWithCourse = Prisma.CertificateGetPayload<{ include: { course: true } }>;
+type CourseSummary = { id: string; title: string; description: string };
+type Progress = { id: string; isCompleted: boolean };
+type EnrollmentWithCourseProgress = { id: string; courseId: string; course: CourseSummary; progress: Progress[] };
+type NotificationItem = { id: string; title: string; message: string };
+type CertificateWithCourse = { id: string; course: CourseSummary };
 
 export default async function StudentDashboard() {
   const session = await requireRole(["STUDENT"]);
@@ -15,21 +14,24 @@ export default async function StudentDashboard() {
 
   const enrollments: EnrollmentWithCourseProgress[] = await prisma.enrollment.findMany({
     where: { userId },
-    include: {
-      course: true,
-      progress: true
+    select: {
+      id: true,
+      courseId: true,
+      course: { select: { id: true, title: true, description: true } },
+      progress: { select: { id: true, isCompleted: true } }
     }
   });
 
   const notifications: NotificationItem[] = await prisma.notification.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
-    take: 3
+    take: 3,
+    select: { id: true, title: true, message: true }
   });
 
   const certificates: CertificateWithCourse[] = await prisma.certificate.findMany({
     where: { userId },
-    include: { course: true }
+    select: { id: true, course: { select: { id: true, title: true, description: true } } }
   });
 
   return (

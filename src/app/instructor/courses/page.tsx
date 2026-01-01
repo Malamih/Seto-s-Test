@@ -1,16 +1,26 @@
-import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type CourseWithCategory = Prisma.CourseGetPayload<{ include: { category: true } }>;
+type Category = { id: string; name: string };
+type CourseWithCategory = {
+  id: string;
+  title: string;
+  description: string;
+  category: Category;
+};
 
 export default async function InstructorCoursesPage() {
   const session = await requireRole(["INSTRUCTOR"]);
   const courses: CourseWithCategory[] = await prisma.course.findMany({
     where: { instructorId: session.user.id as string },
-    include: { category: true }
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      category: { select: { id: true, name: true } }
+    }
   });
 
   async function deleteCourse(formData: FormData) {

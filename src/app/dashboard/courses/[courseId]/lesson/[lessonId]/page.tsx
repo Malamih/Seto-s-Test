@@ -1,11 +1,18 @@
-import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type LessonWithRelations = Prisma.LessonGetPayload<{
-  include: { course: true; comments: { include: { user: true } } };
-}>;
+type Course = { id: string; title: string };
+type CommentUser = { id: string; name: string | null };
+type Comment = { id: string; content: string; reply: string | null; user: CommentUser };
+type LessonWithRelations = {
+  id: string;
+  title: string;
+  videoUrl: string;
+  attachmentUrl: string | null;
+  course: Course;
+  comments: Comment[];
+};
 
 interface LessonPageProps {
   params: { courseId: string; lessonId: string };
@@ -17,9 +24,21 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   const lesson: LessonWithRelations | null = await prisma.lesson.findUnique({
     where: { id: params.lessonId },
-    include: {
-      course: true,
-      comments: { include: { user: true }, orderBy: { createdAt: "desc" } }
+    select: {
+      id: true,
+      title: true,
+      videoUrl: true,
+      attachmentUrl: true,
+      course: { select: { id: true, title: true } },
+      comments: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          content: true,
+          reply: true,
+          user: { select: { id: true, name: true } }
+        }
+      }
     }
   });
 
@@ -102,7 +121,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           </button>
         </form>
         <div className="mt-6 space-y-3 text-sm text-white/70">
-          {lesson.comments.map((comment: LessonWithRelations["comments"][number]) => (
+          {lesson.comments.map((comment: Comment) => (
             <div key={comment.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
               <p className="font-semibold">{comment.user.name}</p>
               <p className="mt-1">{comment.content}</p>

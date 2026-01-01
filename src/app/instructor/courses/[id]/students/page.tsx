@@ -1,10 +1,9 @@
-import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type EnrollmentWithUserProgress = Prisma.EnrollmentGetPayload<{
-  include: { user: true; progress: true };
-}>;
+type Progress = { id: string; isCompleted: boolean };
+type Student = { id: string; name: string; email: string };
+type EnrollmentWithUserProgress = { id: string; user: Student; progress: Progress[] };
 
 interface StudentsPageProps {
   params: { id: string };
@@ -14,7 +13,11 @@ export default async function CourseStudentsPage({ params }: StudentsPageProps) 
   const session = await requireRole(["INSTRUCTOR"]);
   const enrollments: EnrollmentWithUserProgress[] = await prisma.enrollment.findMany({
     where: { courseId: params.id, course: { instructorId: session.user.id as string } },
-    include: { user: true, progress: true }
+    select: {
+      id: true,
+      user: { select: { id: true, name: true, email: true } },
+      progress: { select: { id: true, isCompleted: true } }
+    }
   });
 
   return (

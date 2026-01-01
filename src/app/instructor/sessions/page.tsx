@@ -1,20 +1,26 @@
-import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type CourseListItem = Prisma.CourseGetPayload<{}>;
-type LiveSessionWithCourse = Prisma.LiveSessionGetPayload<{ include: { course: true } }>;
+type CourseListItem = { id: string; title: string };
+type LiveSessionWithCourse = { id: string; title: string; scheduledAt: Date; meetingUrl: string; course: CourseListItem };
 
 export default async function InstructorSessionsPage() {
   const session = await requireRole(["INSTRUCTOR"]);
   const instructorId = session.user.id as string;
   const courses: CourseListItem[] = await prisma.course.findMany({
-    where: { instructorId }
+    where: { instructorId },
+    select: { id: true, title: true }
   });
   const sessions: LiveSessionWithCourse[] = await prisma.liveSession.findMany({
     where: { instructorId },
-    include: { course: true },
+    select: {
+      id: true,
+      title: true,
+      scheduledAt: true,
+      meetingUrl: true,
+      course: { select: { id: true, title: true } }
+    },
     orderBy: { scheduledAt: "asc" }
   });
 

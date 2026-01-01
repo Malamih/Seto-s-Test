@@ -1,17 +1,31 @@
-import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type CommentWithRelations = Prisma.CommentGetPayload<{
-  include: { user: true; course: true; lesson: true };
-}>;
+type CommentUser = { id: string; name: string | null };
+type CommentCourse = { id: string; title: string };
+type CommentLesson = { id: string; title: string } | null;
+type CommentWithRelations = {
+  id: string;
+  content: string;
+  reply: string | null;
+  user: CommentUser;
+  course: CommentCourse;
+  lesson: CommentLesson;
+};
 
 export default async function InstructorCommentsPage() {
   const session = await requireRole(["INSTRUCTOR"]);
   const comments: CommentWithRelations[] = await prisma.comment.findMany({
     where: { course: { instructorId: session.user.id as string } },
-    include: { user: true, course: true, lesson: true },
+    select: {
+      id: true,
+      content: true,
+      reply: true,
+      user: { select: { id: true, name: true } },
+      course: { select: { id: true, title: true } },
+      lesson: { select: { id: true, title: true } }
+    },
     orderBy: { createdAt: "desc" }
   });
 

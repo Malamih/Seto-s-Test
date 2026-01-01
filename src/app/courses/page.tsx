@@ -1,11 +1,18 @@
-import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import type { Category } from "@/types/domain";
 
-type CourseWithRelations = Prisma.CourseGetPayload<{
-  include: { category: true; instructor: true; reviews: true };
-}>;
+type Category = { id: string; name: string; slug: string | null };
+type Instructor = { id: string; name: string | null };
+type Review = { id: string; rating: number };
+type CourseWithRelations = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: Category;
+  instructor: Instructor;
+  reviews: Review[];
+};
 
 interface CoursesPageProps {
   searchParams?: {
@@ -22,7 +29,9 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
   const price = searchParams?.price ?? "all";
   const rating = Number(searchParams?.rating ?? "0");
 
-  const categories: Category[] = await prisma.category.findMany();
+  const categories: Category[] = await prisma.category.findMany({
+    select: { id: true, name: true, slug: true }
+  });
   const courses: CourseWithRelations[] = await prisma.course.findMany({
     where: {
       status: "PUBLISHED",
@@ -38,10 +47,14 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
       ...(price === "free" ? { price: 0 } : {}),
       ...(price === "paid" ? { price: { gt: 0 } } : {})
     },
-    include: {
-      category: true,
-      instructor: true,
-      reviews: true
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      price: true,
+      category: { select: { id: true, name: true, slug: true } },
+      instructor: { select: { id: true, name: true } },
+      reviews: { select: { id: true, rating: true } }
     }
   });
 

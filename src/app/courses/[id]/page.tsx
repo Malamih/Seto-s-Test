@@ -1,18 +1,27 @@
-import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
-type CourseWithDetails = Prisma.CourseGetPayload<{
-  include: {
-    category: true;
-    instructor: true;
-    lessons: true;
-    reviews: { include: { user: true } };
-    comments: { include: { user: true } };
-    liveSessions: true;
-  };
-}>;
+type Category = { id: string; name: string };
+type Instructor = { id: string; name: string | null };
+type Lesson = { id: string; title: string; order: number };
+type ReviewUser = { id: string; name: string | null };
+type Review = { id: string; rating: number; comment: string; user: ReviewUser };
+type CommentUser = { id: string; name: string | null };
+type Comment = { id: string; content: string; reply: string | null; user: CommentUser };
+type LiveSession = { id: string; title: string };
+type CourseWithDetails = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: Category;
+  instructor: Instructor;
+  lessons: Lesson[];
+  reviews: Review[];
+  comments: Comment[];
+  liveSessions: LiveSession[];
+};
 
 interface CourseDetailsProps {
   params: { id: string };
@@ -21,13 +30,35 @@ interface CourseDetailsProps {
 export default async function CourseDetails({ params }: CourseDetailsProps) {
   const course: CourseWithDetails | null = await prisma.course.findUnique({
     where: { id: params.id },
-    include: {
-      category: true,
-      instructor: true,
-      lessons: { orderBy: { order: "asc" } },
-      reviews: { include: { user: true } },
-      comments: { include: { user: true }, orderBy: { createdAt: "desc" } },
-      liveSessions: true
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      price: true,
+      category: { select: { id: true, name: true } },
+      instructor: { select: { id: true, name: true } },
+      lessons: {
+        orderBy: { order: "asc" },
+        select: { id: true, title: true, order: true }
+      },
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          user: { select: { id: true, name: true } }
+        }
+      },
+      comments: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          content: true,
+          reply: true,
+          user: { select: { id: true, name: true } }
+        }
+      },
+      liveSessions: { select: { id: true, title: true } }
     }
   });
 
@@ -86,7 +117,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
           <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-lg font-semibold">محتوى الدورة</h2>
             <ul className="mt-4 space-y-3 text-sm text-white/70">
-              {course.lessons.map((lesson: CourseWithDetails["lessons"][number]) => (
+              {course.lessons.map((lesson: Lesson) => (
                 <li key={lesson.id}>• {lesson.title}</li>
               ))}
             </ul>
@@ -95,7 +126,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
           <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <h2 className="text-lg font-semibold">التقييمات</h2>
             <div className="mt-4 space-y-4 text-sm text-white/70">
-              {course.reviews.map((review: CourseWithDetails["reviews"][number]) => (
+              {course.reviews.map((review: Review) => (
                 <div key={review.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
                   <p className="font-semibold">{review.user.name}</p>
                   <p>التقييم: {review.rating} نجوم</p>
@@ -119,7 +150,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
               </button>
             </form>
             <div className="mt-6 space-y-3 text-sm text-white/70">
-              {course.comments.map((comment: CourseWithDetails["comments"][number]) => (
+              {course.comments.map((comment: Comment) => (
                 <div key={comment.id} className="rounded-2xl border border-white/10 bg-white/10 p-4">
                   <p className="font-semibold">{comment.user.name}</p>
                   <p className="mt-1">{comment.content}</p>
@@ -136,7 +167,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <h3 className="text-lg font-semibold">جلسات مباشرة</h3>
             <ul className="mt-4 space-y-3 text-sm text-white/70">
-              {course.liveSessions.map((session: CourseWithDetails["liveSessions"][number]) => (
+              {course.liveSessions.map((session: LiveSession) => (
                 <li key={session.id}>• {session.title}</li>
               ))}
             </ul>

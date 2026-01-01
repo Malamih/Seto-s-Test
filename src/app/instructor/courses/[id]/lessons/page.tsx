@@ -1,9 +1,9 @@
-import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type CourseWithLessons = Prisma.CourseGetPayload<{ include: { lessons: true } }>;
+type Lesson = { id: string; title: string; order: number };
+type CourseWithLessons = { id: string; title: string; lessons: Lesson[] };
 
 interface CourseLessonsProps {
   params: { id: string };
@@ -13,7 +13,14 @@ export default async function CourseLessonsPage({ params }: CourseLessonsProps) 
   const session = await requireRole(["INSTRUCTOR"]);
   const course: CourseWithLessons | null = await prisma.course.findFirst({
     where: { id: params.id, instructorId: session.user.id as string },
-    include: { lessons: { orderBy: { order: "asc" } } }
+    select: {
+      id: true,
+      title: true,
+      lessons: {
+        orderBy: { order: "asc" },
+        select: { id: true, title: true, order: true }
+      }
+    }
   });
 
   if (!course) {
@@ -90,7 +97,7 @@ export default async function CourseLessonsPage({ params }: CourseLessonsProps) 
         </button>
       </form>
       <div className="space-y-4">
-        {course.lessons.map((lesson: CourseWithLessons["lessons"][number]) => (
+        {course.lessons.map((lesson: Lesson) => (
           <div key={lesson.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <h2 className="font-semibold">{lesson.title}</h2>
             <p className="text-sm text-white/70">الترتيب: {lesson.order}</p>
