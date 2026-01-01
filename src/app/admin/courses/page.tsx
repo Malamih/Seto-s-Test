@@ -1,11 +1,16 @@
-import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
-type CourseWithRelations = Prisma.CourseGetPayload<{
-  include: { instructor: true; category: true };
-}>;
+type Category = { id: string; name: string };
+type Instructor = { id: string; name: string | null };
+type CourseWithRelations = {
+  id: string;
+  title: string;
+  status: string;
+  category: Category;
+  instructor: Instructor;
+};
 
 export default async function AdminCoursesPage() {
   await requireRole(["ADMIN"]);
