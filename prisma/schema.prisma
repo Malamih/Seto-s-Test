@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         String       @default("STUDENT")
+  createdAt    DateTime     @default(now())
+  courses      Course[]     @relation("InstructorCourses")
+  enrollments  Enrollment[]
+  reviews      Review[]
+  comments     Comment[]
+  notifications Notification[]
+  certificates Certificate[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  courses   Course[]
+}
+
+model Course {
+  id           String       @id @default(cuid())
+  title        String
+  description  String
+  price        Int
+  status       String       @default("DRAFT")
+  categoryId   String
+  instructorId String
+  createdAt    DateTime     @default(now())
+  category     Category     @relation(fields: [categoryId], references: [id])
+  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+  reviews      Review[]
+  comments     Comment[]
+  liveSessions LiveSession[]
+  certificates Certificate[]
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  videoUrl  String?
+  order     Int
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Enrollment {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  progressPercent Int      @default(0)
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+  course          Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  reply     String?
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Certificate {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  issuedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model LiveSession {
+  id        String   @id @default(cuid())
+  title     String
+  startsAt  DateTime
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+}
