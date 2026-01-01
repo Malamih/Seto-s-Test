@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
@@ -13,7 +14,7 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
   });
 
   if (!certificate || certificate.userId !== session.user.id) {
-    return <p>الشهادة غير متاحة.</p>;
+    notFound();
   }
 
   return (

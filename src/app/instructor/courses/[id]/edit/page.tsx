@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 import type { Category } from "@/types/domain";
@@ -15,7 +15,7 @@ export default async function EditCoursePage({ params }: EditCourseProps) {
   const categories: Category[] = await prisma.category.findMany();
 
   if (!course) {
-    return <p>الدورة غير متاحة.</p>;
+    notFound();
   }
 
   async function updateCourse(formData: FormData) {

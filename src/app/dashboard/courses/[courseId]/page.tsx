@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
@@ -30,7 +31,7 @@ export default async function CourseProgressPage({ params }: CourseProgressProps
   });
 
   if (!enrollment) {
-    return <p>لم يتم العثور على اشتراكك في هذه الدورة.</p>;
+    notFound();
   }
 
   const lessons = enrollment.progress.sort((a, b) => a.lesson.order - b.lesson.order);

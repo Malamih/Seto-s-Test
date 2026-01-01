@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
@@ -63,7 +64,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
   });
 
   if (!course) {
-    return <p>الدورة غير متاحة حاليًا.</p>;
+    notFound();
   }
 
   const avgRating = course.reviews.length

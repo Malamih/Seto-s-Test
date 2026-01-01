@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
@@ -12,7 +13,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   });
 
   if (!course) {
-    return <p>الدورة غير موجودة.</p>;
+    notFound();
   }
 
   async function handleCheckout() {

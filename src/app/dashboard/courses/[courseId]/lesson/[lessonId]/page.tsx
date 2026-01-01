@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
@@ -43,7 +44,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   });
 
   if (!lesson) {
-    return <p>الدرس غير متاح.</p>;
+    notFound();
   }
 
   async function markComplete() {

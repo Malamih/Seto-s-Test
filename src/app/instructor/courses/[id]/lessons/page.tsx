@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session";
 
@@ -24,7 +24,7 @@ export default async function CourseLessonsPage({ params }: CourseLessonsProps) 
   });
 
   if (!course) {
-    return <p>الدورة غير متاحة.</p>;
+    notFound();
   }
 
   async function addLesson(formData: FormData) {

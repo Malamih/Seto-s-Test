@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 type InstructorCourse = { id: string; title: string; description: string };
@@ -22,7 +23,7 @@ export default async function InstructorPage({ params }: InstructorPageProps) {
   });
 
   if (!instructor) {
-    return <p>المدرب غير موجود.</p>;
+    notFound();
   }
 
   return (
