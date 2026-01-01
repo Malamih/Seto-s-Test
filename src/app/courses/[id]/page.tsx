@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
+import { notFound } from "next/navigation";
 
 interface CourseDetailsProps {
   params: { id: string };
@@ -19,9 +20,10 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
     }
   });
 
-  if (!course) {
-    return <p>الدورة غير متاحة حاليًا.</p>;
-  }
+  if (!course) notFound();
+
+  // ✅ مهم: نثبت الـid حتى ما يصير null داخل الـserver action
+  const courseId = course.id;
 
   const avgRating = course.reviews.length
     ? course.reviews.reduce((acc, review) => acc + review.rating, 0) / course.reviews.length
@@ -37,7 +39,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
       data: {
         content,
         userId: session.user.id as string,
-        courseId: course.id
+        courseId: courseId
       }
     });
   }
@@ -55,7 +57,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
         </div>
         <div className="flex flex-wrap gap-3">
           <Link
-            href={`/courses/${course.id}/checkout`}
+            href={`/courses/${courseId}/checkout`}
             className="rounded-xl bg-[#9e28b5] px-5 py-2 text-sm font-semibold"
           >
             اشترك الآن
@@ -124,8 +126,8 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <h3 className="text-lg font-semibold">جلسات مباشرة</h3>
             <ul className="mt-4 space-y-3 text-sm text-white/70">
-              {course.liveSessions.map((session) => (
-                <li key={session.id}>• {session.title}</li>
+              {course.liveSessions.map((live) => (
+                <li key={live.id}>• {live.title}</li>
               ))}
             </ul>
           </div>
